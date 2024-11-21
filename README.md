@@ -1,6 +1,7 @@
 # go-test-nat
 
 A Golang STUN client for getting NAT type and external IP refered to PyStun(https://github.com/jtriley/pystun)
+
 Follow RFC 3489: http://www.ietf.org/rfc/rfc3489.txt
 
 ### Use the Command Line
