@@ -1,7 +1,7 @@
 package main
 
 import (
-	"go-test-nat/stun"
+	"github.com/dplcz/go-test-nat/stun"
 	"log"
 )
 
