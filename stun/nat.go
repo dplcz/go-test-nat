@@ -120,12 +120,12 @@ func stunTest(conn *net.UDPConn, host string, port int, sendData string) (retVal
 	}
 	buf := make([]byte, 2048)
 	// set socket timeout
-	conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+	conn.SetReadDeadline(time.Now().Add(15 * time.Second))
 	for i = 0; i < 3; i++ {
 		_, _, err = conn.ReadFromUDP(buf)
 		if err, ok := err.(net.Error); ok && err.Timeout() {
 			tempVal.resp = false
-			conn.SetReadDeadline(time.Now().Add(2 * time.Second))
+			conn.SetReadDeadline(time.Now().Add(15 * time.Second))
 			continue
 		}
 		// parse response data
