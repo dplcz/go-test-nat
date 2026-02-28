@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	mRand "math/rand/v2"
 	"net"
 	"strconv"
 	"strings"
@@ -120,12 +121,12 @@ func stunTest(conn *net.UDPConn, host string, port int, sendData string) (retVal
 	}
 	buf := make([]byte, 2048)
 	// set socket timeout
-	conn.SetReadDeadline(time.Now().Add(15 * time.Second))
+	conn.SetReadDeadline(time.Now().Add(1 * time.Second))
 	for i = 0; i < 3; i++ {
 		_, _, err = conn.ReadFromUDP(buf)
 		if err, ok := err.(net.Error); ok && err.Timeout() {
 			tempVal.resp = false
-			conn.SetReadDeadline(time.Now().Add(15 * time.Second))
+			conn.SetReadDeadline(time.Now().Add(1 * time.Second))
 			continue
 		}
 		// parse response data
@@ -180,23 +181,35 @@ func stunTest(conn *net.UDPConn, host string, port int, sendData string) (retVal
 	return tempVal, nil
 }
 
+func getStunServer(conn *net.UDPConn) string {
+	mRand.Shuffle(len(stunServers), func(i, j int) {
+		stunServers[i], stunServers[j] = stunServers[j], stunServers[i]
+	})
+	for _, stunServer := range stunServers {
+		_, err := stunTest(conn, stunServer, 3478, "")
+		if err != nil {
+			continue
+		} else {
+			return stunServer
+		}
+	}
+	return ""
+}
+
 func getNatType(conn *net.UDPConn, sourceIp string, sourcePort int) (string, retVal, error) {
 	var ret retVal
 	var err error
 	var server string
-
+	server = getStunServer(conn)
 	log.Println("Do Test1")
 	resp := false
-	for _, server = range stunServers {
-		ret, err = stunTest(conn, server, 3478, "")
-		if err != nil {
-			return "", ret, err
-		}
-		resp = ret.resp
-		if resp {
-			break
-		}
+
+	ret, err = stunTest(conn, server, 3478, "")
+	if err != nil {
+		return "", ret, err
 	}
+	resp = ret.resp
+
 	if !resp {
 		return Blocked, ret, nil
 	}
