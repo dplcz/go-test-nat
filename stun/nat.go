@@ -270,17 +270,15 @@ func getNatType(conn *net.UDPConn, sourceIp string, sourcePort int) (string, ret
 func GetIpInfo() (string, string, int, error) {
 	serverAddr, err := net.ResolveUDPAddr("udp", ":")
 	if err != nil {
-		log.Fatal(err)
 		return "", "", 0, err
 	}
 	conn, err := net.ListenUDP("udp", serverAddr)
 	if err != nil {
-		log.Fatal(err)
+		return "", "", 0, err
 	}
 	defer conn.Close()
 	natType, ret, err := getNatType(conn, string(serverAddr.IP), serverAddr.Port)
 	if err != nil {
-		log.Fatal(err)
 		return "", "", 0, err
 	}
 	return natType, ret.externalIp, ret.externalPort, nil
