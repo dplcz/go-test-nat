@@ -251,6 +251,9 @@ func getNatType(conn *net.UDPConn, sourceIp string, sourcePort int) (string, ret
 					changedPortReq := strings.Join(temp, "")
 					log.Println("Do Test3")
 					ret, err = stunTest(conn, changedIp, 3478, changedPortReq)
+					if err != nil {
+						return "", ret, err
+					}
 					log.Println("Result: ", ret)
 					if ret.resp {
 						return RestrictNAT, ret, nil
